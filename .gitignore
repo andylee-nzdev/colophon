@@ -1,0 +1,35 @@
+# macOS
+.DS_Store
+
+# IDEs
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+
+# Secrets and local config — env vars only, never committed
+.env
+.env.*
+!.env.example
+
+# Local-only working docs (plans, notes, scratch) — never committed
+/local/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Node (apps/admin, apps/demo)
+node_modules/
+.next/
+out/
+dist/
+build/
+.turbo/
+
+# Java / Maven (apps/api keeps its own .gitignore too)
+target/
