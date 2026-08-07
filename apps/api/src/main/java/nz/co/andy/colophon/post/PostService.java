@@ -8,6 +8,8 @@ import nz.co.andy.colophon.common.web.PageResponse;
 import nz.co.andy.colophon.config.ContentProperties;
 import nz.co.andy.colophon.post.dto.PostRequest;
 import nz.co.andy.colophon.post.dto.PostResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ import org.springframework.util.StringUtils;
 @Transactional(readOnly = true)
 public class PostService {
 
+    private static final Logger logger = LoggerFactory.getLogger(PostService.class);
     private final PostRepository repository;
     private final ContentProperties contentProperties;
 
@@ -40,6 +43,7 @@ public class PostService {
         Page<Post> page = published == null
                 ? repository.findByLocaleAndPublishedIsTrue(resolved, pageable)
                 : repository.findByLocaleAndPublished(resolved, published, pageable);
+        logger.info("list: {}", page.stream().count());
         return PageResponse.of(page, PostMapper::toResponse);
     }
 
