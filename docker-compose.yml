@@ -38,6 +38,29 @@ services:
       # some deps (rolldown, oxlint) ship platform-specific binaries.
       - colophon-admin-node-modules:/app/node_modules
 
+  demo:
+    image: node:26-alpine
+    container_name: colophon-demo
+    working_dir: /app
+    # A one-shot build, not a server: `next build` writes the static export to
+    # apps/demo/out on the host and the container exits. Run it with
+    # `docker compose run --rm demo` after publishing; `up` skips it (see profiles).
+    command: sh -c "npm install && npm run build"
+    profiles: ["build"]
+    environment:
+      # Unlike the admin's VITE_API_URL, this is read by the *container* — the fetch
+      # happens during the build, server-side — so localhost would be the container
+      # itself. host-gateway below makes this resolve to the host-run API.
+      COLOPHON_API_URL: http://host.docker.internal:8080
+      COLOPHON_LOCALE: en
+    extra_hosts:
+      # Present by default on Docker Desktop, but not on Linux; declaring it works on both.
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./apps/demo:/app
+      - colophon-demo-node-modules:/app/node_modules
+
 volumes:
   colophon-db-data:
   colophon-admin-node-modules:
+  colophon-demo-node-modules:
