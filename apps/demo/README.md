@@ -42,6 +42,49 @@ npm start        # serve out/ at http://localhost:3000
 `npm run dev` also works and is faster to iterate on, but it re-fetches per request, so
 it is the one mode that does *not* demonstrate the point of the app.
 
+To see the property the whole thing exists for, stop the API while `npm start` is still
+serving. Every page keeps working, because none of them were ever going to ask.
+
+## Deploying it
+
+The output is a directory of files, so any static host will do — Vercel, Cloudflare
+Pages, Netlify, S3 + CloudFront, GitHub Pages, nginx. What matters is not which host, but
+that **the API has to be publicly reachable from the build machine**. Deploy the API
+first; a build cannot reach your laptop.
+
+Two settings every host needs, because this is a monorepo and the app is not at the root:
+
+| Setting | Value |
+| --- | --- |
+| Root / base directory | `apps/demo` |
+| Build command | `npm run build` |
+| Output / publish directory | `out` |
+| Build-time env | `COLOPHON_API_URL`, and `COLOPHON_LOCALE` if not `en` |
+
+Set `COLOPHON_API_URL` as a **build** variable, not a runtime one. There is no runtime.
+
+On Vercel, set Root Directory to `apps/demo` and it detects the rest. On GitHub Pages,
+served from a subpath, you also need `basePath` and `assetPrefix` in `next.config.ts` —
+otherwise every asset URL points at the domain root.
+
+### Rebuilding when content changes
+
+Publishing does not update the site; a build does. Until the CMS's outbound webhook
+exists (roadmap phase 6), the options are a deploy hook called by hand, a scheduled
+build, or a push. Once it does exist, it points at the host's deploy hook and the CMS
+never learns what a "Vercel" is.
+
+### The free-tier cold start
+
+The roadmap puts the API on a free tier that sleeps. That is harmless at request time —
+nothing requests it — but it is *not* harmless at build time: the first call after a
+sleep can time out or return a 502 from the host's edge while the container wakes, and
+this build treats any non-2xx as fatal.
+
+There is no retry in `src/lib/api.ts` today. On a sleeping API, expect to occasionally
+re-run a failed build, or add a retry-with-backoff around `fetchPage` before relying on
+an automated publish pipeline.
+
 ## Configuration
 
 | Variable | Default | Used by |

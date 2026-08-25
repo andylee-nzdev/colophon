@@ -87,3 +87,8 @@ deliberate — see `apps/demo/README.md`.
   pattern that `yd-temple` will copy. If the API's read contract changes — paging
   envelope, locale filtering, published-by-default — `apps/demo/src/lib/api.ts` is
   where that shows up first.
+- `apps/demo` runs Next.js **16** with the App Router, which like Boot 4 is newer than
+  most tutorial content — much of what's written about Next assumes 13/14. The version's
+  own docs ship in `apps/demo/node_modules/next/dist/docs/`; prefer them over recalled
+  API shapes. (Next offers to generate an `AGENTS.md` saying exactly this; it's turned
+  off in `next.config.ts` because it rewrote the file on every `next dev`.)
